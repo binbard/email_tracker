@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Email Tracking Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .track-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f4f4f9;
+        }
+
+        .track-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .timestamps {
+            display: none;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .timestamps ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .timestamps li {
+            margin: 5px 0;
+        }
+    </style>
+    <script>
+        function toggleDetails(trackId) {
+            const allDetails = document.querySelectorAll('.timestamps');
+            allDetails.forEach(detail => detail.style.display = 'none');
+
+            const details = document.getElementById(`details-${trackId}`);
+            if (details.style.display === 'block') {
+                details.style.display = 'none';
+            } else {
+                details.style.display = 'block';
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tracking Data for User: {{ user_id }}</h1>
+        {% for track_id, timestamps in id_map.items() %}
+        <div class="track-item" onclick="toggleDetails('{{ track_id }}')">
+            <strong>Tracking ID:</strong> {{ track_id }} &nbsp; | &nbsp; <strong>Email Opens:</strong> {{
+            timestamps|length }}
+            <div class="timestamps" id="details-{{ track_id }}">
+                <ul>
+                    {% for timestamp in timestamps %}
+                    <li>{{ timestamp }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
