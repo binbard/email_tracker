@@ -1,6 +1,7 @@
 import sqlite3
 from flask import Flask, request, send_from_directory, render_template
 from datetime import datetime
+import pytz
 
 # http://localhost:5000/53949?id=791518137
 
@@ -46,22 +47,29 @@ def track_user(user_id):
 
 @app.route('/<user_id>/showmee', methods=['GET'])
 def show_user_data(user_id):
+    # Connect to the database
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
-        cursor.execute('''
+        cursor.execute(''' 
             SELECT track_id, timestamp FROM tracking_data
             WHERE user_id = ?
         ''', (user_id,))
         rows = cursor.fetchall()
 
+    kolkata_tz = pytz.timezone('Asia/Kolkata')
+    
     id_map = {}
     for track_id, timestamp in rows:
-        human_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        dt = datetime.fromtimestamp(timestamp, tz=pytz.utc)
+        kolkata_time = dt.astimezone(kolkata_tz)
+        human_time = kolkata_time.strftime('%Y-%m-%d %H:%M:%S')
+
         if track_id not in id_map:
             id_map[track_id] = []
         id_map[track_id].append(human_time)
 
     return render_template('show_me.html', user_id=user_id, id_map=id_map)
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=6565, debug=True)
